@@ -132,10 +132,12 @@ def softmax(x):
 
 def cosine_similarity(a, b):
     """Compute cosine similarity between two vectors"""
-    pass
+
+    return jnp.dot(a, b) / (jnp.linalg.norm(a) * jnp.linalg.norm(b))
 
 if __name__ == "__main__":
-    x = jnp.array([3, 2, 1])
-    sm = softmax(x)
-    print(sm)
-    print(jnp.sum(sm))
+        
+    x = jnp.array([1, 2, 2])
+    y = jnp.array([4, 5, 6])
+
+    print(cosine_similarity(x, y))
