@@ -41,3 +41,41 @@ def neural_network_gradients():
     # 1. Compute gradient of network output w.r.t input x
     # 2. Compute gradient of network w.r.t parameters
     # 3. Implement a loss function and compute its gradients
+
+    # Definining parameters
+    x = jnp.array([0.5, -1.0, 2.0])
+
+    w1 = jnp.array([
+        [0.1, -0.2, 0.3],
+        [0.4,  0.1, -0.1]
+    ])
+
+    b1 = jnp.array([0.01, -0.02])
+
+    w2 = jnp.array([0.2, -0.3])
+
+    b2 = jnp.array(0.05)
+
+    params = (w1, b1, w2, b2)
+
+    # 1
+    grad_wrt_x = grad(simple_network, argnums=1)(params, x)
+    print("Gradient of network output w.r.t x:", grad_wrt_x)
+
+    # 2
+    grad_wrt_params= grad(simple_network, argnums=0)(params, x)
+    print("Gradient of network output w.r.t params:", grad_wrt_params)
+    
+    # 3
+    def loss(params, x, y_true):
+        y_pred = simple_network(params, x)
+        return (y_pred - y_true) ** 2
+    
+    y_true = 1.0  
+
+    loss_val, loss_grad = value_and_grad(loss, argnums=0)(params, x, y_true)   
+    print("\nLoss value:", loss_val)
+    print("Gradients of loss w.r.t params:", loss_grad)
+
+if __name__ == "__main__":
+    neural_network_gradients()
