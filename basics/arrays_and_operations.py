@@ -86,25 +86,56 @@ def broadcasting_examples():
     4. Implement: normalize array to mean=0, std=1
     """
     
-    x = jnp.array([1, 2, 3],
-                  [4, 5, 6])
-    
-    result = x + 5
+    # Jax tries to make operation on different shappes compatible by
+    # ALigning shapes from the righ, adding size 1 dimensions if needed,
+    # or repeating (broadcastiong) along those dimensions
 
-    print(result)
+    # Scalar + array
+    x = jnp.array([[1, 2, 3],
+                  [4, 5, 6]])
+    
+    ex1 = x + 5
+
+    # 1D + 2D
+    v = jnp.array([10, 20, 30])
+    ex2 = x + v
+
+    # elment wise operations
+    col = jnp.array([[1],
+                     [2]])
+    
+    ex3 = x * col
+
+    # Normalise
+    def normalise(x):
+        mean = jnp.mean(x, axis=0, keepdims=True)
+        std = jnp.std(x, axis=0, keepdims=True)
+
+        return (x - mean) / (std + 1e-8)
+    
+    ex4 = normalise(x)
+
+    print(ex4)
+
 
 # Exercise 1.4: Challenge - Implement Simple Functions
-def normalize(x):
-    """Normalize array to mean=0, std=1"""
-    pass
 
 def softmax(x):
     """Implement softmax function (numerically stable)"""
-    pass
+    
+    x = x - jnp.max(x)
+    exp_x = jnp.exp(x)
+
+    return exp_x/ jnp.sum(exp_x)
+
+    
 
 def cosine_similarity(a, b):
     """Compute cosine similarity between two vectors"""
     pass
 
 if __name__ == "__main__":
-    broadcasting_examples()
+    x = jnp.array([3, 2, 1])
+    sm = softmax(x)
+    print(sm)
+    print(jnp.sum(sm))
