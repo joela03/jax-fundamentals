@@ -47,3 +47,24 @@ def jit_patterns():
     @jit
     def mlp_layer(w, b, x):
         return jnp.tanh(jnp.dot(w, x) + b)
+    
+    #2 jit doesnt like changing shapes or data dependent loops
+    @jit
+    def bad(x, n):
+        out = 0
+        # n is dynamic at runtime
+        for i in range(n): 
+            out += x[i]
+        return out
+    
+    # fix by using static argnums
+    bad_fixed = jit(bad, static_argnums=1)
+    # now n is treated as a compile-yime constant
+
+    @jit 
+    def dynamic_shape(x):
+        # shape can change as x is a variable
+        y = jnp.ones((x,x))
+        return y
+
+    dynamic_shape_fixed = jit(dynamic_shape, static_argnums=0)
