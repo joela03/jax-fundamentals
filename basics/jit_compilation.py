@@ -32,7 +32,6 @@ def jit_patterns():
     # Your tasks:
     # 1. Create functions that benefit from JIT
     # 2. Handle cases where JIT can't be used (control flow with dynamic shapes)
-    # 3. Use static_argnums for functions with non-array arguments
 
     # 1 faster when many elmentwise operation, if theres a function with reduction + broadcasting
     # or an mlp block
