@@ -50,4 +50,21 @@ def init_layer_params(key, n_in, n_out):
 
     return W, b
 
- 
+def init_network_params(layer_sizes, key):
+    """Initialises all network parameters
+    
+        Takes in the layer sizes (Input, Hidden, Hidden, Output)
+        
+        Returns List of weights and biases for each layer"""
+    
+    # Generate a key for each set of parameters needed
+    keys = jax.random.split(key, len(layer_sizes) - 1)
+
+    params = []
+
+    # Pair dims of consecutive layers for parameter generation
+    for i, (n_in, n_out) in enumerate(zip(layer_sizes[:-1], layer_sizes[1:])):
+        W, b = init_layer_params(keys[i], n_in, n_out)
+        params.append((W, b))
+
+    return params
