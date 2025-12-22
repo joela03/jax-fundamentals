@@ -103,3 +103,30 @@ def softmax(x):
     
     exp_x = jnp.exp(x-jnp.max(x, axis=-1, keepdims=True))
     return exp_x/ jnp.sum(exp_x, axis=-1, keepdims=True)
+
+def forward_pass(params, x):
+    """Forward propagation through the network
+    
+    Args:
+        params: List of Weight and Bias tuples
+        x: Input data of shape (batch_size, input_dim)
+        
+    Returns:
+        Output probabilities of shape (batch_sixe, num_classes)
+    """
+
+    activations = x
+
+    # Pass through all layers bar the last one
+    for W, b in params[:-1]:
+        # multiply input by Weight and bias
+        z = activations @ W + b
+
+        # non-linear activation
+        activations = relu(z)
+
+    # final output layer with softmax
+    W_final, b_final = params[-1]
+    logits = activations @ W_final + b_final
+
+    return softmax(logits)
