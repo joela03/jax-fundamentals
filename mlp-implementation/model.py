@@ -8,7 +8,11 @@ from sklearn.model_selection import train_test_split
 
 def load_Fashion_MNIST():
     """Load and process the Fashion MNIST dataset, contains 10 classes of clothing and each
-    image is 28x28 and grayscale, which gets flattened to 584 features"""
+    image is 28x28 and grayscale, which gets flattened to 584 features
+    
+    Returns:
+    Tuple of (X_train, X_test, y_train, y_test) as JAX arrays
+    """
 
     print("Loading Fashion MNIST dataset")
     X, y = fetch_openml('Fashion-MNIST', version=1, return_X_y=True, parser='auto')
@@ -35,7 +39,17 @@ def init_layer_params(key, n_in, n_out):
         Random initialisation so that:
         - symmetry is broken and all neurons will learn differently
         - small random values prevent saturaion of activation functions initially
-        - standard normal is simple and works well for small networks"""
+        - standard normal is simple and works well for small network
+        
+        Args:
+            key: JAX PRNG key for randomness
+            n_in: Number of input features
+            n_out: Number of output features
+            
+        Returns:
+            Tuple of (weights, biases)
+            - weights: size n_in by n_out sapmled from normal distribution
+            - biases: size n_out"""
     
     # Split key for weights (key is for randomness), w_key is a tuple and we select 
     # first value from tuple
@@ -53,9 +67,12 @@ def init_layer_params(key, n_in, n_out):
 def init_network_params(layer_sizes, key):
     """Initialises all network parameters
     
-        Takes in the layer sizes (Input, Hidden, Hidden, Output)
+        Args: 
+            layer_sizes: list of integers (Input, Hidden, Hidden, Output)
+            key: JAX PRNG key
         
-        Returns List of weights and biases for each layer"""
+        Returns:
+            List of weights and biases for each layer"""
     
     # Generate a key for each set of parameters needed
     keys = jax.random.split(key, len(layer_sizes) - 1)
