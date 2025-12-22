@@ -68,3 +68,10 @@ def init_network_params(layer_sizes, key):
         params.append((W, b))
 
     return params
+
+# Activation FUnctions
+
+def relu(x):
+    """Activation function that introduces non linearity so that the model can learn"""
+
+    return jnp.maximum(0, x)
