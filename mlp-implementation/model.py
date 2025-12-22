@@ -49,3 +49,5 @@ def init_layer_params(key, n_in, n_out):
     b = jnp.zeros(n_out)
 
     return W, b
+
+ 
