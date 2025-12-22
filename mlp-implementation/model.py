@@ -28,3 +28,24 @@ def load_Fashion_MNIST():
     print(f"Number of classes: {len(jnp.unique(y))}")
 
     return X_train, X_test, y_train, y_test
+
+def init_layer_params(key, n_in, n_out):
+    """Initialising parameters for a single layer using Gaussian initialision
+    
+        Random initialisation so that:
+        - symmetry is broken and all neurons will learn differently
+        - small random values prevent saturaion of activation functions initially
+        - standard normal is simple and works well for small networks"""
+    
+    # Split key for weights (key is for randomness), w_key is a tuple and we select 
+    # first value from tuple
+    w_key, = jax.random.split(key, 1)
+
+    # Sample from normal distribution, w_key is a seed for the random sequence produces
+    # same key means same outputs, creayes tensor with dim n_in, n_out
+    W = jax.random.normal(w_key, (n_in, n_out))
+
+    # Biases are initalised to zero
+    b = jnp.zeros(n_out)
+
+    return W, b
