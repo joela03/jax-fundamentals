@@ -35,7 +35,7 @@ def vmap_basics():
 
     # vmap: params unbatched, x batched along axis 0
     batched_forward = vmap(single_forward, in_axes=(None, 0))
-
+mk
     single_data = jnp.array([1.0, 2.0, 3.0])      # shape (3,)
     batch_data  = jnp.array([
         [1.0, 2.0, 3.0],   # shape (3,)
