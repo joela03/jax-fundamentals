@@ -75,3 +75,14 @@ def relu(x):
     """Activation function that introduces non linearity so that the model can learn"""
 
     return jnp.maximum(0, x)
+
+def softmax(x):
+    """"Converts logits to probability distributionb (outputs sum to 1) and range 0, 1
+    
+        Args:
+            x: Logits (batch_size, num_classes)
+        Returns:
+            Probabilities (batch_size, num_classes)"""
+    
+    exp_x = jnp.exp(x-jnp.max(x, axis=-1, keepdims=True))
+    return exp_x/ jnp.sum(exp_x, axis=-1, keepdims=True)
