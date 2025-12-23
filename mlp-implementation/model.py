@@ -177,3 +177,23 @@ def accuracy(params, x, y):
     predicted_classes = jnp.argmax(predictions, axis=-1)
 
     return jnp.mean(predicted_classes == y)
+
+# Optimisation
+def sgd_update(params, grads, learning_rate):
+    """
+    Updates params by taking old params and subtactiong the learning rate 
+    multiplied by the gradient of loss for the params
+    
+    Args:
+    params: Current params (list of (W, b) tuples)
+    grads: Gradients (sam structuiure as params)
+    learning_rate: step size
+
+    Returns:
+        Updated parameters (new list of (W, b) tuples)
+    """
+
+    return [
+        (W - learning_rate * dW, b - learning_rate * db)
+        for (W, b), (dW, db) in zip(params, grads)
+    ]
