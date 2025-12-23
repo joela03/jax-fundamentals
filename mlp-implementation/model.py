@@ -318,3 +318,30 @@ def training_network(params, X_train, y_train, X_test, y_test,
               f"Test Acc: {test_acc:.4f}")
     
     return params
+
+def main():
+    """Main function which demonstrates the entire ML Pipeline"""
+
+    print("Fashion MNIST Dataset Neural Network")
+
+    # Initialise random key
+    key = jax.random.key(42)
+
+    # Load and prepocess data
+    X_train, X_test, y_train, y_test = load_Fashion_MNIST()
+
+    # Define network architecture
+    layer_sizes = [784, 128, 64, 10]
+    print(f'/nNetwork Architecture')
+    print(f'Layer sizes: {'->'.join(map(str, layer_sizes))}')
+
+    # Initialise parameters
+    key, init_key = jax.random.split(key)
+    params = init_network_params(layer_sizes, init_key)
+
+    # Count total parameters
+    total_params = sum(W.size + b.size for (W, b) in params)
+    print(f'Total parameters: {total_params}')
+    print(f'Parameter breakdown')
+    for i, (W, b) in enumerate(params):
+        print(f'Layer {i+1}: W{W.shape} + b{b.shape} = {W.size+b.size} parameters')
