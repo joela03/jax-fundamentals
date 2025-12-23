@@ -332,7 +332,7 @@ def main():
 
     # Define network architecture
     layer_sizes = [784, 128, 64, 10]
-    print(f'/nNetwork Architecture')
+    print(f'\nNetwork Architecture')
     print(f'Layer sizes: {'->'.join(map(str, layer_sizes))}')
 
     # Initialise parameters
