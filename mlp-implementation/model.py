@@ -197,3 +197,29 @@ def sgd_update(params, grads, learning_rate):
         (W - learning_rate * dW, b - learning_rate * db)
         for (W, b), (dW, db) in zip(params, grads)
     ]
+
+@jit
+def train_step(params, x_batch, y_batch, learning_rate):
+    """
+    Single step: compute loss, gradients, and update params
+    Jit so we compile using xla
+    
+    Args:
+        params: Current network parameters
+        x_batch: Input batch
+        y_batch: Label batch
+        learning_rate: step_size
+
+    Returns:
+        Tuple of (updated_params, loss_value)
+    """
+
+
+    # # Compute loss and grads
+    loss_value, grads = jax.value_and_grad(cross_entropy_loss)(params, x_batch, y_batch)
+    
+    # Update params using computed gradients
+    new_params = sgd_update(params, grads, learning_rate)
+
+    return new_params, loss_value
+
