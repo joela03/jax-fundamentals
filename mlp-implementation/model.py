@@ -58,7 +58,7 @@ def init_layer_params(key, n_in, n_out):
 
     # Sample from normal distribution, w_key is a seed for the random sequence produces
     # same key means same outputs, creayes tensor with dim n_in, n_out
-    W = jax.random.normal(w_key, (n_in, n_out))
+    W = jax.random.normal(w_key, (n_in, n_out)) / jnp.sqrt(n_in)
 
     # Biases are initalised to zero
     b = jnp.zeros(n_out)
