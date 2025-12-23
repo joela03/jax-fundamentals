@@ -345,3 +345,17 @@ def main():
     print(f'Parameter breakdown')
     for i, (W, b) in enumerate(params):
         print(f'Layer {i+1}: W{W.shape} + b{b.shape} = {W.size+b.size} parameters')
+
+
+    # Training the network
+    training_start = time.time()
+    key, training_key = jax.random.split(key)
+
+    trained_params = training_network(
+        params, X_train, X_test, y_train, y_test,
+        epochs=10, batch_size=128, learning_rate=0.01,
+        key=training_key
+    )
+
+    training_time = time.time() - training_start
+
