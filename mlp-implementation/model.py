@@ -352,7 +352,7 @@ def main():
     key, training_key = jax.random.split(key)
 
     trained_params = training_network(
-        params, X_train, X_test, y_train, y_test,
+        params, X_train, y_train, X_test, y_test,
         epochs=10, batch_size=128, learning_rate=0.01,
         key=training_key
     )
