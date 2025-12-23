@@ -223,3 +223,33 @@ def train_step(params, x_batch, y_batch, learning_rate):
 
     return new_params, loss_value
 
+def create_batches(X, y, batch_size, key):
+    """
+    Create random sized mini batches
+    
+    Args:
+        X: feature data (n_samples, n_features)
+        y: labels (n_samples, )
+        batch_size: number of samples per batch
+        key: JAX PRNG key for shuffling
+
+    Returns:
+    List of (X_batch, y_batch) tuples
+    """
+
+    n_samples = X.shape[0]
+
+    # randomly shuffle indices
+    indices = jax.random.permutation(key, n_samples)
+
+    batches = []
+    
+    for start_idx in range(0, n_samples, batch_size):
+        end_idx = min(start_idx + batch_size, n_samples)
+        batch_indices = indices[start_idx: end_idx]
+
+        X_batch = X[batch_indices]
+        y_batch = y[batch_indices]
+        batches.append((X_batch, y_batch))
+
+    return batches
