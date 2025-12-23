@@ -130,3 +130,30 @@ def forward_pass(params, x):
     logits = activations @ W_final + b_final
 
     return softmax(logits)
+
+
+# Loss function
+def cross_entropy_loss(params, x_batch, y_batch):
+    """Loss function for multi class classification
+    
+        Formula: L = -SUM(y_true*log(y_pred)
+        
+        Args:
+            params: network parameters
+            x_batch: input batch of shape (batch_size, input_dim)
+            y_batch: True labels of shape (batch size, )
+
+        Returns:
+            Scalar loss value (mean of batch)
+        """
+    
+    # Forward pass to get predictions
+    predictions = forward_pass(params, x_batch)
+
+    # Covert int labels to one hot encoding
+    y_onehot = jax.nn.one_hot(y_batch, num_classes=10)
+
+    # Cross-entropy
+    loss = -jnp.sum(y_onehot * jnp.log(predictions + 1e-8), axis=-1)
+
+    return jnp.mean(loss)
