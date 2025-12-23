@@ -157,3 +157,23 @@ def cross_entropy_loss(params, x_batch, y_batch):
     loss = -jnp.sum(y_onehot * jnp.log(predictions + 1e-8), axis=-1)
 
     return jnp.mean(loss)
+
+
+# Metrics
+def accuracy(params, x, y):
+    """"Calculating classification accuracy by dividing correct predictions
+        by tot predictions
+        
+        Args:
+            params: network parameters
+            x: Input data
+            y: True labels
+
+        Returns:
+            Scalar accuracy [0, 1]
+        """
+    
+    predictions = forward_pass(params, x)
+    predicted_classes = jnp.argmax(predictions, axis=-1)
+
+    return jnp.mean(predicted_classes == y)
