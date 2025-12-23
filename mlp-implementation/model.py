@@ -4,6 +4,7 @@ from jax import grad, jit
 import numpy as np
 from sklearn.datasets import fetch_openml
 from sklearn.model_selection import train_test_split
+import time
 
 
 def load_Fashion_MNIST():
@@ -243,7 +244,7 @@ def create_batches(X, y, batch_size, key):
     indices = jax.random.permutation(key, n_samples)
 
     batches = []
-    
+
     for start_idx in range(0, n_samples, batch_size):
         end_idx = min(start_idx + batch_size, n_samples)
         batch_indices = indices[start_idx: end_idx]
@@ -253,3 +254,67 @@ def create_batches(X, y, batch_size, key):
         batches.append((X_batch, y_batch))
 
     return batches
+
+def training_network(params, X_train, y_train, X_test, y_test,
+                   epochs=10, batch_size=128, learning_rate=0.01, key=None)
+    """
+    Main training loop implementing mini-batch stochastic gradient descent
+
+    - Create mini-bacthes
+    - Forward pass to compute predictions
+    - Loss calculation
+    - Backward pass to compute gradients
+    - Parameter updates
+
+    Args:
+        params: initial network params
+        X_train, y_train: training data
+        X_test, y_test: test data
+        epochs: number of passes through the dataset
+        batch_size: mini batch size
+        learning_rate: step size for gradient descent
+        key: JAX PRNG key
+
+    Returns:
+        Trained parameters
+    """
+
+    if key is None:
+        key = jax.random.key(0)
+
+    print(f"\nTraining Configuration:")
+    print(f"  Epochs: {epochs}")
+    print(f"  Batch size: {batch_size}")
+    print(f"  Learning rate: {learning_rate}")
+    print(f"  Batches per epoch: {len(X_train) // batch_size}")
+    print(f"  Using JIT compilation: True")
+    print()
+
+    for epoch in range(epochs):
+        epoch_start = time.time()
+
+        # Split key for this epoch's shuffling
+        key, subkey = jax.random.split(key)
+
+        # Create mini batches
+        batches = create_batches(X_train, y_train, batch_size, subkey)
+
+        # Train for all batches
+        epoch_losses = []
+        for X_batch, y_batch in batches:
+            params, loss_value = train_step(params, X_batch, y_batch, learning_rate)
+            epoch_losses.append(loss_value)
+
+        # Calculate metrics
+        avg_loss = jnp.mean(jnp.array(epoch_losses))
+        train_acc = accuracy(params, X_train, y_train)
+        test_acc = accuracy(params, X_test, y_test)
+
+        epoch_time = time.time() - epoch_start
+
+        print(f"Epoch {epoch+1:2d}/{epochs} ({epoch_time:5.2f}s) | "
+              f"Loss: {avg_loss:.4f} | "
+              f"Train Acc: {train_acc:.4f} | "
+              f"Test Acc: {test_acc:.4f}")
+    
+    return params
