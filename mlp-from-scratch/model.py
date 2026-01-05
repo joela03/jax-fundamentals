@@ -58,7 +58,7 @@ def init_layer_params(key, n_in, n_out):
 
     # Sample from normal distribution, w_key is a seed for the random sequence produces
     # same key means same outputs, creayes tensor with dim n_in, n_out
-    W = jax.random.normal(w_key, (n_in, n_out))
+    W = jax.random.normal(w_key, (n_in, n_out)) / jnp.sqrt(n_in)
 
     # Biases are initalised to zero
     b = jnp.zeros(n_out)
@@ -256,7 +256,7 @@ def create_batches(X, y, batch_size, key):
     return batches
 
 def training_network(params, X_train, y_train, X_test, y_test,
-                   epochs=10, batch_size=128, learning_rate=0.01, key=None)
+                   epochs=10, batch_size=128, learning_rate=0.01, key=None):
     """
     Main training loop implementing mini-batch stochastic gradient descent
 
@@ -318,3 +318,79 @@ def training_network(params, X_train, y_train, X_test, y_test,
               f"Test Acc: {test_acc:.4f}")
     
     return params
+
+def main():
+    """Main function which demonstrates the entire ML Pipeline"""
+
+    print("Fashion MNIST Dataset Neural Network")
+
+    # Initialise random key
+    key = jax.random.key(42)
+
+    # Load and prepocess data
+    X_train, X_test, y_train, y_test = load_Fashion_MNIST()
+
+    # Define network architecture
+    layer_sizes = [784, 128, 64, 10]
+    print(f'\nNetwork Architecture')
+    print(f'Layer sizes: {'->'.join(map(str, layer_sizes))}')
+
+    # Initialise parameters
+    key, init_key = jax.random.split(key)
+    params = init_network_params(layer_sizes, init_key)
+
+    # Count total parameters
+    total_params = sum(W.size + b.size for (W, b) in params)
+    print(f'Total parameters: {total_params}')
+    print(f'Parameter breakdown')
+    for i, (W, b) in enumerate(params):
+        print(f'Layer {i+1}: W{W.shape} + b{b.shape} = {W.size+b.size} parameters')
+
+
+    # Training the network
+    training_start = time.time()
+    key, training_key = jax.random.split(key)
+
+    trained_params = training_network(
+        params, X_train, y_train, X_test, y_test,
+        epochs=20, batch_size=128, learning_rate=0.01,
+        key=training_key
+    )
+
+    training_time = time.time() - training_start
+
+    # Final results
+    final_train_acc = accuracy(trained_params, X_train, y_train)
+    final_test_acc = accuracy(trained_params, X_test, y_test)
+    final_train_loss = cross_entropy_loss(trained_params, X_train, y_train)
+    final_test_loss = cross_entropy_loss(trained_params, X_test, y_test)
+
+    print(f"Training Accuracy:   {final_train_acc:.4f}")
+    print(f"Test Accuracy:       {final_test_acc:.4f}")
+    print(f"Training Loss:       {final_train_loss:.4f}")
+    print(f"Test Loss:           {final_test_loss:.4f}")
+    print(f"Total training time: {training_time:.2f} seconds")
+    print(f"Time per epoch:      {training_time/10:.2f} seconds")
+
+    # Sample predictions
+    class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
+                   'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
+
+    key, sample_key = jax.random.split(key)
+    sample_indices = jax.random.choice(sample_key, len(X_test), shape=(5,), replace=False)
+
+    for idx in sample_indices:
+        x_sample = X_test[idx:idx+1]
+        y_true = y_test[idx]
+
+        predictions = forward_pass(trained_params, x_sample)
+        y_pred = jnp.argmax(predictions)
+        confidence = predictions[0, y_pred]
+
+        correct = "✓" if y_pred == y_true else "✗"
+        print(f"{correct} True: {class_names[y_true]:12s} | "
+              f"Predicted: {class_names[y_pred]:12s} | "
+              f"Confidence: {confidence:.2%}")
+
+if __name__ == "__main__":
+    main()
